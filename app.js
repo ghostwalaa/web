@@ -7,8 +7,19 @@ const AppState = {
     currentView: 'homepage',
     currentProduct: null,
     editingProductId: null,
-    whatsappNumber: '+919876543210'
+    whatsappNumber: '+919106170271'
 };
+
+// Cloudinary Configuration
+const CLOUDINARY_CONFIG = {
+    cloudName: 'dh0lwgppa',
+    apiKey: '493997553956792',
+    uploadPreset: 'ml_default',
+    uploadUrl: 'https://api.cloudinary.com/v1_1/dh0lwgppa/image/upload'
+};
+
+// Store uploaded images temporarily
+let tempUploadedImages = [];
 
 // Sample Product Data
 const sampleProducts = [
@@ -18,7 +29,13 @@ const sampleProducts = [
         price: 2500,
         category: "Sarees",
         description: "Authentic Rajasthani saree with traditional bandhani work. Made from pure cotton with vibrant colors and intricate patterns. Perfect for festivals and special occasions.",
-        images: ["https://via.placeholder.com/400x500/FF6B6B/FFFFFF?text=Bandhani+Saree"],
+        images: [
+            "https://via.placeholder.com/600x700/FF6B6B/FFFFFF?text=Bandhani+Front",
+            "https://via.placeholder.com/600x700/FF8B8B/FFFFFF?text=Bandhani+Detail",
+            "https://via.placeholder.com/600x700/FFABAB/FFFFFF?text=Bandhani+Back",
+            "https://via.placeholder.com/600x700/FF6B8B/FFFFFF?text=Bandhani+Pattern",
+            "https://via.placeholder.com/600x700/FF7B7B/FFFFFF?text=Bandhani+Fabric"
+        ],
         sizes: ["S", "M", "L", "XL"],
         rating: 4.5,
         active: true
@@ -29,7 +46,13 @@ const sampleProducts = [
         price: 1200,
         category: "Kurtis",
         description: "Beautiful embroidered kurti in traditional Jaipur style. Features hand-embroidered details on soft cotton fabric. Comfortable for daily wear.",
-        images: ["https://via.placeholder.com/400x500/4ECDC4/FFFFFF?text=Cotton+Kurti"],
+        images: [
+            "https://via.placeholder.com/600x700/4ECDC4/FFFFFF?text=Kurti+Front",
+            "https://via.placeholder.com/600x700/5EDDD4/FFFFFF?text=Kurti+Back",
+            "https://via.placeholder.com/600x700/6EEDE4/FFFFFF?text=Kurti+Detail",
+            "https://via.placeholder.com/600x700/4EBDC4/FFFFFF?text=Kurti+Embroidery",
+            "https://via.placeholder.com/600x700/4ECDD4/FFFFFF?text=Kurti+Fabric"
+        ],
         sizes: ["XS", "S", "M", "L"],
         rating: 4.8,
         active: true
@@ -40,7 +63,14 @@ const sampleProducts = [
         price: 4500,
         category: "Lehengas",
         description: "Stunning designer lehenga with intricate mirror work and embroidery. Made from premium silk fabric. Perfect for weddings and special celebrations.",
-        images: ["https://via.placeholder.com/400x500/95E1D3/FFFFFF?text=Wedding+Lehenga"],
+        images: [
+            "https://via.placeholder.com/600x700/95E1D3/FFFFFF?text=Lehenga+Full",
+            "https://via.placeholder.com/600x700/A5F1E3/FFFFFF?text=Lehenga+Choli",
+            "https://via.placeholder.com/600x700/85D1C3/FFFFFF?text=Lehenga+Detail",
+            "https://via.placeholder.com/600x700/95E1E3/FFFFFF?text=Lehenga+Work",
+            "https://via.placeholder.com/600x700/95D1D3/FFFFFF?text=Lehenga+Back",
+            "https://via.placeholder.com/600x700/A5E1D3/FFFFFF?text=Lehenga+Dupatta"
+        ],
         sizes: ["S", "M", "L", "XL"],
         rating: 4.9,
         active: true
@@ -51,7 +81,13 @@ const sampleProducts = [
         price: 1800,
         category: "Dresses",
         description: "Elegant Anarkali dress with traditional block print designs. Flowing silhouette in soft cotton blend. Ideal for parties and gatherings.",
-        images: ["https://via.placeholder.com/400x500/F38181/FFFFFF?text=Anarkali+Dress"],
+        images: [
+            "https://via.placeholder.com/600x700/F38181/FFFFFF?text=Anarkali+Front",
+            "https://via.placeholder.com/600x700/F39191/FFFFFF?text=Anarkali+Back",
+            "https://via.placeholder.com/600x700/F3A1A1/FFFFFF?text=Anarkali+Side",
+            "https://via.placeholder.com/600x700/F37171/FFFFFF?text=Anarkali+Print",
+            "https://via.placeholder.com/600x700/F38191/FFFFFF?text=Anarkali+Detail"
+        ],
         sizes: ["S", "M", "L"],
         rating: 4.6,
         active: true
@@ -62,7 +98,14 @@ const sampleProducts = [
         price: 3200,
         category: "Sarees",
         description: "Luxurious silk saree with beautiful golden border. Rich colors and smooth texture. Perfect for traditional ceremonies.",
-        images: ["https://via.placeholder.com/400x500/AA96DA/FFFFFF?text=Silk+Saree"],
+        images: [
+            "https://via.placeholder.com/600x700/AA96DA/FFFFFF?text=Silk+Drape",
+            "https://via.placeholder.com/600x700/BA96DA/FFFFFF?text=Silk+Border",
+            "https://via.placeholder.com/600x700/9A96DA/FFFFFF?text=Silk+Pallu",
+            "https://via.placeholder.com/600x700/AA86DA/FFFFFF?text=Silk+Pattern",
+            "https://via.placeholder.com/600x700/AAA6DA/FFFFFF?text=Silk+Fabric",
+            "https://via.placeholder.com/600x700/AA96CA/FFFFFF?text=Silk+Detail"
+        ],
         sizes: ["S", "M", "L", "XL"],
         rating: 4.7,
         active: true
@@ -73,7 +116,13 @@ const sampleProducts = [
         price: 1500,
         category: "Kurtis",
         description: "Trendy kurti with matching palazzo pants. Beautiful printed patterns in vibrant colors. Comfortable and stylish for everyday wear.",
-        images: ["https://via.placeholder.com/400x500/FCBAD3/FFFFFF?text=Palazzo+Set"],
+        images: [
+            "https://via.placeholder.com/600x700/FCBAD3/FFFFFF?text=Set+Full",
+            "https://via.placeholder.com/600x700/FCCAE3/FFFFFF?text=Set+Kurti",
+            "https://via.placeholder.com/600x700/FCAAC3/FFFFFF?text=Set+Palazzo",
+            "https://via.placeholder.com/600x700/FCBAe3/FFFFFF?text=Set+Print",
+            "https://via.placeholder.com/600x700/FCBAD4/FFFFFF?text=Set+Detail"
+        ],
         sizes: ["XS", "S", "M", "L", "XL"],
         rating: 4.5,
         active: true
@@ -84,7 +133,15 @@ const sampleProducts = [
         price: 5500,
         category: "Lehengas",
         description: "Exquisite bridal lehenga with heavy embroidery and stone work. Premium quality fabric with intricate detailing. A showstopper for your special day.",
-        images: ["https://via.placeholder.com/400x500/FFD93D/FFFFFF?text=Bridal+Lehenga"],
+        images: [
+            "https://via.placeholder.com/600x700/FFD93D/FFFFFF?text=Bridal+Full",
+            "https://via.placeholder.com/600x700/FFE94D/FFFFFF?text=Bridal+Choli",
+            "https://via.placeholder.com/600x700/FFC93D/FFFFFF?text=Bridal+Skirt",
+            "https://via.placeholder.com/600x700/FFD94D/FFFFFF?text=Bridal+Work",
+            "https://via.placeholder.com/600x700/FFD92D/FFFFFF?text=Bridal+Stone",
+            "https://via.placeholder.com/600x700/FFD95D/FFFFFF?text=Bridal+Back",
+            "https://via.placeholder.com/600x700/FFD93E/FFFFFF?text=Bridal+Detail"
+        ],
         sizes: ["S", "M", "L"],
         rating: 5.0,
         active: true
@@ -450,8 +507,12 @@ function setupEventListeners() {
     document.getElementById('admin-logout-btn')?.addEventListener('click', logout);
     document.getElementById('add-product-btn')?.addEventListener('click', () => {
         AppState.editingProductId = null;
+        tempUploadedImages = [];
         navigateTo('admin-product-form');
     });
+    
+    // Cloudinary Upload
+    document.getElementById('cloudinary-upload-btn')?.addEventListener('click', openCloudinaryWidget);
     
     // Close dropdowns when clicking outside
     document.addEventListener('click', (e) => {
@@ -667,9 +728,24 @@ function renderProductDetail(productId) {
     AppState.currentProduct = product;
     const detailContent = document.getElementById('product-detail-content');
     
+    // Get related products from same category
+    const relatedProducts = AppState.products
+        .filter(p => p.active && p.category === product.category && p.id !== product.id)
+        .slice(0, 6);
+    
     detailContent.innerHTML = `
-        <div>
-            <img src="${product.images[0]}" alt="${product.name}" class="product-detail-image">
+        <div class="product-detail-gallery">
+            <div class="main-image-container">
+                <img src="${product.images[0]}" alt="${product.name}" class="main-product-image" id="main-product-image">
+                <div class="image-counter" id="image-counter">1 / ${product.images.length}</div>
+            </div>
+            <div class="thumbnail-strip">
+                ${product.images.map((img, index) => `
+                    <img src="${img}" alt="${product.name} ${index + 1}" 
+                         class="thumbnail-image ${index === 0 ? 'active' : ''}" 
+                         data-index="${index}">
+                `).join('')}
+            </div>
         </div>
         <div class="product-detail-info">
             <p style="color: var(--color-text-light); text-transform: uppercase; font-size: 14px;">${product.category}</p>
@@ -700,6 +776,18 @@ function renderProductDetail(productId) {
         </div>
     `;
     
+    // Add related products section
+    if (relatedProducts.length > 0) {
+        detailContent.innerHTML += `
+            <div class="related-products-section">
+                <h3>More from ${product.category}</h3>
+                <div class="related-products-grid">
+                    ${relatedProducts.map(p => createProductCard(p)).join('')}
+                </div>
+            </div>
+        `;
+    }
+    
     // Attach event listeners
     let selectedSize = product.sizes[0];
     let quantity = 1;
@@ -727,6 +815,26 @@ function renderProductDetail(productId) {
     document.getElementById('add-to-cart-detail')?.addEventListener('click', () => {
         addToCart(product, selectedSize, quantity);
     });
+    
+    // Image gallery functionality
+    const thumbnails = document.querySelectorAll('.thumbnail-image');
+    const mainImage = document.getElementById('main-product-image');
+    const imageCounter = document.getElementById('image-counter');
+    
+    thumbnails.forEach(thumb => {
+        thumb.addEventListener('click', (e) => {
+            const index = parseInt(e.currentTarget.dataset.index);
+            mainImage.src = product.images[index];
+            imageCounter.textContent = `${index + 1} / ${product.images.length}`;
+            
+            // Update active thumbnail
+            thumbnails.forEach(t => t.classList.remove('active'));
+            e.currentTarget.classList.add('active');
+        });
+    });
+    
+    // Attach listeners to related product cards
+    attachProductCardListeners();
 }
 
 // Cart Functions
@@ -998,8 +1106,11 @@ function renderProductForm() {
         document.getElementById('product-category').value = product.category;
         document.getElementById('product-rating').value = product.rating;
         document.getElementById('product-description').value = product.description;
-        document.getElementById('product-image').value = product.images[0];
         document.getElementById('product-active').checked = product.active;
+        
+        // Load existing images
+        tempUploadedImages = [...product.images];
+        renderUploadedImages();
         
         // Set sizes
         document.querySelectorAll('.size-checkbox').forEach(checkbox => {
@@ -1007,18 +1118,30 @@ function renderProductForm() {
         });
     } else {
         document.getElementById('product-form').reset();
+        tempUploadedImages = [];
+        renderUploadedImages();
     }
+    
+    // Re-attach Cloudinary button listener after form render
+    setTimeout(() => {
+        document.getElementById('cloudinary-upload-btn')?.addEventListener('click', openCloudinaryWidget);
+    }, 100);
 }
 
 function handleProductSave(e) {
     e.preventDefault();
+    
+    // Validate images
+    if (tempUploadedImages.length < 3) {
+        alert('Please upload at least 3 images for the product.');
+        return;
+    }
     
     const name = document.getElementById('product-name').value;
     const price = parseFloat(document.getElementById('product-price').value);
     const category = document.getElementById('product-category').value;
     const rating = parseFloat(document.getElementById('product-rating').value);
     const description = document.getElementById('product-description').value;
-    const image = document.getElementById('product-image').value || 'https://via.placeholder.com/400x500';
     const active = document.getElementById('product-active').checked;
     
     const sizes = Array.from(document.querySelectorAll('.size-checkbox:checked')).map(cb => cb.value);
@@ -1029,7 +1152,7 @@ function handleProductSave(e) {
         category,
         rating,
         description,
-        images: [image],
+        images: [...tempUploadedImages],
         sizes,
         active
     };
@@ -1048,7 +1171,91 @@ function handleProductSave(e) {
     
     alert('Product saved successfully!');
     AppState.editingProductId = null;
+    tempUploadedImages = [];
     navigateTo('admin-products');
+}
+
+// Cloudinary Upload Functions
+function openCloudinaryWidget() {
+    if (typeof cloudinary === 'undefined') {
+        alert('Cloudinary widget is not loaded. Please check your internet connection.');
+        return;
+    }
+    
+    const widget = cloudinary.createUploadWidget({
+        cloudName: CLOUDINARY_CONFIG.cloudName,
+        uploadPreset: CLOUDINARY_CONFIG.uploadPreset,
+        sources: ['local', 'url', 'camera'],
+        multiple: true,
+        maxFiles: 8,
+        maxFileSize: 5000000, // 5MB
+        clientAllowedFormats: ['jpg', 'jpeg', 'png', 'webp'],
+        resourceType: 'image',
+        folder: 'jaipur_elegance_products',
+        showPoweredBy: false,
+        styles: {
+            palette: {
+                window: '#FFFFFF',
+                windowBorder: '#1a3a52',
+                tabIcon: '#1a3a52',
+                menuIcons: '#1a3a52',
+                textDark: '#000000',
+                textLight: '#FFFFFF',
+                link: '#1a3a52',
+                action: '#d4af37',
+                inactiveTabIcon: '#999999',
+                error: '#dc3545',
+                inProgress: '#1a3a52',
+                complete: '#28a745',
+                sourceBg: '#f8f9fa'
+            }
+        }
+    }, (error, result) => {
+        if (error) {
+            console.error('Upload error:', error);
+            alert('Upload failed: ' + error.message);
+            return;
+        }
+        
+        if (result && result.event === 'success') {
+            const imageUrl = result.info.secure_url;
+            tempUploadedImages.push(imageUrl);
+            renderUploadedImages();
+        }
+        
+        if (result && result.event === 'close') {
+            widget.close();
+        }
+    });
+    
+    widget.open();
+}
+
+function renderUploadedImages() {
+    const container = document.getElementById('uploaded-images');
+    if (!container) return;
+    
+    if (tempUploadedImages.length === 0) {
+        container.innerHTML = '';
+        return;
+    }
+    
+    container.innerHTML = tempUploadedImages.map((url, index) => `
+        <div class="uploaded-image-item ${index === 0 ? 'primary' : ''}">
+            ${index === 0 ? '<span class="primary-badge">Primary</span>' : ''}
+            <img src="${url}" alt="Product image ${index + 1}">
+            <button type="button" class="remove-image" data-index="${index}">&times;</button>
+        </div>
+    `).join('');
+    
+    // Attach remove listeners
+    document.querySelectorAll('.remove-image').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const index = parseInt(e.currentTarget.dataset.index);
+            tempUploadedImages.splice(index, 1);
+            renderUploadedImages();
+        });
+    });
 }
 
 // Utility Functions
